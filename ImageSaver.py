@@ -161,7 +161,7 @@ class ImageSaver:
             json.dump(log, log_file)
             self.log(f'\nLog file saved to {log_file_path}', True)
         self.log(f'Uploading log file to disk with overwrite...', True)
-        response = self.__uploader.upload_local_file(log_file_path)
+        response = self.__uploader.upload_local_file(file_path=log_file_path, folder=(folder + '/'))
         if response['success']:
             self.log(f'Log file uploaded to disk', True)
         else:

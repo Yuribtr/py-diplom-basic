@@ -132,10 +132,11 @@ class YaUploader:
                                 params=params, headers=self.__headers)
         return self.get_response_content(response)
 
-    def upload_local_file(self, file_path: str):
+    def upload_local_file(self, file_path: str, folder: str = ''):
         """
         This method uploads local file to Yandex disk
         Description here: https://yandex.ru/dev/disk/api/reference/upload.html
+        :param folder: folder names separated by sign "/" and at the end
         :param file_path: local file path
         :return: {'object': 'contains JSON object or None if response body empty',
                  'success': 'True if requested path found (if specified) and no error codes',
@@ -148,7 +149,8 @@ class YaUploader:
             self.log('Error: file name is empty', True)
             return {'object': None, 'success': False, 'message': f'File name is empty'}
         # first we have to get upload link
-        params = {'path': file_path, 'overwrite': True}
+
+        params = {'path': folder + file_path, 'overwrite': True}
         response = requests.get(self.__api_base_url + self.__upload_scheme, params=params, headers=self.__headers)
         upload_link = self.get_response_content(response)
         if not upload_link['success']:
@@ -198,6 +200,7 @@ class YaUploader:
     def upload_remote_file(self, file_path: str, url: str):
         """
         Uploads files to Yandex disk using url link
+
         :param file_path: file name with extension on disk where remote file to be stored
         :param url: url string from which file will be taken
         :return: {'object': 'contains JSON object or None if response body empty',
