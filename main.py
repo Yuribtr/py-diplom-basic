@@ -30,20 +30,25 @@ def run_demo():
             app_id_vk = input(
                 f'{PrintColors.OKGREEN}VK token was not set. Pls input your APP ID to show auth URL: {PrintColors.ENDC}')
         print('Pls use below link in browser to get VK token: ' + ImageSaver.get_auth_link(app_id_vk, 'status,friends'))
+
     while token_vk == '':
         token_vk = input(f'{PrintColors.OKGREEN}Pls input VK token: {PrintColors.ENDC}')
+
     while token_ya == '':
         print('Yandex Disk token was not set. You can take it here: https://yandex.ru/dev/disk/poligon/')
         token_ya = input(f'{PrintColors.OKGREEN}Pls input Yandex Disk token: {PrintColors.ENDC}')
 
     print('Seems that everything is ready. Let\'s go!')
     print('\n' + f'{PrintColors.OKBLUE}Starting{PrintColors.ENDC}'.center(padding, '-'))
+
     saver = ImageSaver(token_vk=token_vk, token_ya=token_ya, uid_vk=vk_user_id, debug_mode=DEBUG_MODE)
     if not saver.is_initialized():
         print(f'{PrintColors.FAIL}Can\'t continue. I interrupt the demo!{PrintColors.ENDC}')
         return
+
     print('\n' + f'{PrintColors.OKBLUE}Heating{PrintColors.ENDC}'.center(padding, '-'))
     saver.get_user_vk_status()
+
     result = saver.get_file_info(folder_name)
     if result['success']:
         choice = ''
@@ -56,6 +61,7 @@ def run_demo():
                 break
             elif choice == 'n':
                 break
+
     result = saver.create_folder(folder_name)
     # Let's continue even if 409 error received (folder exist)
     if result['success'] or result['message'].find('409') >= 0:

@@ -18,7 +18,10 @@ class VkClient:
         self.__initialized = True
         # try to instantiate
         user = self.get_users(user_ids=user_id)
+        is_deactivated = False
         if user['success']:
+            is_deactivated = user['object'][0].get('deactivated', False)
+        if user['success'] and not is_deactivated:
             self.__initialized = True
             self.__user_id = str(user['object'][0]['id'])
             self.__first_name = user['object'][0]['first_name']
@@ -32,6 +35,8 @@ class VkClient:
             self.__first_name = None
             self.__last_name = None
             self.__domain = None
+            if is_deactivated:
+                user['message'] = 'User ' + str(is_deactivated)
             # error message will be in status
             self.__status = f'{type(self).__name__} init failed: ' + user['message']
         self.log(self.__status, True)
