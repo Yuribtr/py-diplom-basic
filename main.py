@@ -18,8 +18,9 @@ def run_demo():
     token_ya = ''
 
     DEBUG_MODE = True
-    vk_user_id = '552934290'
+    vk_user_id = '22'
     folder_name = 'Test'
+    max_images_qty = 10
     album = 'profile'  # can be wall, profile, saved
     log_file_path = 'images_log.json'
     padding = 40
@@ -59,7 +60,7 @@ def run_demo():
     # Let's continue even if 409 error received (folder exist)
     if result['success'] or result['message'].find('409') >= 0:
         print('\n' + f'{PrintColors.OKBLUE}Downloading{PrintColors.ENDC}'.center(padding, '-'))
-        links = saver.get_images_links(album_id=album)
+        links = saver.get_images_links(album_id=album, max_qty=max_images_qty)
         print('\n' + f'{PrintColors.OKBLUE}Uploading{PrintColors.ENDC}'.center(padding, '-'))
         saver.upload_remote_files(folder_name, links, log_file_path)
         print('\n' + f'{PrintColors.OKBLUE}Checking{PrintColors.ENDC}'.center(padding, '-'))

@@ -40,9 +40,11 @@ class ImageSaver:
             else:
                 print(message, sep=sep)
 
-    def get_images_links(self, vk_id=None, album_id='profile'):
+    def get_images_links(self, vk_id=None, album_id='profile', max_qty=10):
         """
         Gets user photos for specified user and album
+        Description here: https://vk.com/dev/photos.get
+        :param max_qty: maximum photos to be returned
         :param vk_id: VK user ID, otherwise will be taken user ID during class instance init
         :param album_id: one of album type: wall, profile, saved
         :return: list with sublists ['likes': int, 'img url': str, 'extension': str, 'size type': str] or empty list
@@ -53,7 +55,8 @@ class ImageSaver:
             return result
         images = []
         offset = 0
-        count = 100
+        # adapting count to minimize request's quantity (max returned items count per request is 1000)
+        count = max_qty if max_qty <= 1000 else 1000
         self.log(f'\nRequesting max {count} {album_id} images links from VK {album_id}...', True)
         while True:
             user_photos = self.__client.get_user_photos(user_id=vk_id, album_id=album_id, count=count, offset=offset)
@@ -66,14 +69,16 @@ class ImageSaver:
             if items_count == 0:
                 break
             images += user_photos['object']['items']
-            offset += count
             # if returned less items than requested, suppose that we reached the end
-            if items_count < count:
+            # or if next iteration will return more items than we requested
+            if items_count < count or count + offset >= max_qty:
                 break
+            offset += count
             # prevent ban from service
             time.sleep(0.3)
         self.log(f'Loading images links finished', True)
-        for item in images:
+        # let's cut images to match exact max_count items
+        for item in images[:max_qty]:
             # let's detect images with the maximum resolution, based on dimensions or on type if dimensions is absent
             img_url = ''
             img_url_fallback = ''
@@ -142,8 +147,7 @@ class ImageSaver:
             log_file_path = 'images_log.json'
         with open(log_file_path, 'w+') as log_file:
             log = []
-            # limit files to max 100 to prevent unnecessary overloading in demo mode
-            for file in files[:4]:
+            for file in files:
                 response = self.__uploader.upload_remote_file(folder + '/' + str(file[0]) + file[1], file[2])
                 if response['success']:
                     self.log(f'Uploading file accepted: {response["object"]["href"]}', True)
