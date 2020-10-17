@@ -20,7 +20,7 @@ def run_demo():
     DEBUG_MODE = True
     vk_user_id = '22'
     folder_name = 'Test'
-    max_images_qty = 10
+    max_images_qty = 5
     album = 'profile'  # can be wall, profile, saved
     log_file_path = 'images_log.json'
     padding = 40

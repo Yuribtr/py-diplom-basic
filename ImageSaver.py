@@ -115,11 +115,9 @@ class ImageSaver:
                  'success': 'True if requested path found (if specified) and no error codes',
                  'message': 'contains error string if any or empty string'}
         """
-        result = {'object': None, 'success': False, 'message': ''}
         if not self.__initialized:
             self.log('Error: not initialized', True)
-            result['message'] = 'Not initialized'
-            return result
+            return {'object': None, 'success': False, 'message': 'Error: not initialized'}
         result = self.__uploader.create_folder(folder_name)
         if result['success']:
             self.log(f'\nFolder created: {result["object"]["href"]}', True)
@@ -130,14 +128,14 @@ class ImageSaver:
     def upload_remote_files(self, folder: str, files: list, log_file_path: str = None):
         """
         Uploads files to Yandex disk using url link
-        :param log_file_path:
+        :param log_file_path: name of log file that contains images info
         :param folder: file name with extension on disk where remote file to be stored
         :param files: list of remote files as sublists ['likes':int, 'img url':str, 'extension':str, 'size type':str]
         :return: {'object': 'contains JSON object or None if response body empty',
                  'success': 'True if requested path found (if specified) and no error codes',
                  'message': 'contains error string if any or empty string'}
         """
-        result = {'object': [], 'success': False, 'message': ''}
+        result = {'object': None, 'success': False, 'message': ''}
         if not self.__initialized:
             self.log('Error: not initialized', True)
             result['message'] = 'Not initialized'
@@ -154,7 +152,8 @@ class ImageSaver:
                     log.append({'filename': f'{str(file[0]) + file[1]}', 'size': f'{file[3]}'})
                 else:
                     self.log(f'Uploading file failed: {file[2]} ({response["object"]})', True)
-                    result = False
+                    result['success'] = False
+                    result['message'] = f'Uploading file failed: {file[2]} ({response["object"]})'
                     break
                 # prevent ban
                 time.sleep(0.3)
@@ -178,7 +177,7 @@ class ImageSaver:
         """
         if not self.__initialized:
             self.log('\nError: not initialized.', True)
-            return False
+            return {'object': None, 'success': False, 'message': 'Error: not initialized'}
         self.log('\nPrinting files list on Yandex disk...', True)
         result = self.__uploader.list_files(50)['object']
         self.log(result, True, sep='\n')
@@ -211,7 +210,7 @@ class ImageSaver:
         """
         if not self.__initialized:
             self.log('\nError: not initialized.', True)
-            return ''
+            return {'object': None, 'success': False, 'message': 'Error: not initialized'}
         self.log('\nTry to delete file or folder: ' + file_path, True)
         result = self.__uploader.delete_file(file_path)
         if result['success']:
@@ -230,7 +229,7 @@ class ImageSaver:
         """
         if not self.__initialized:
             self.log('\nError: not initialized', True)
-            return {'object': [], 'success': False, 'message': 'Error: not initialized'}
+            return {'object': None, 'success': False, 'message': 'Error: not initialized'}
         self.log(f'\nChecking if file/folder "{file_path}" is exist...', True)
         result = self.__uploader.get_file_info(file_path)
         if result['success']:
