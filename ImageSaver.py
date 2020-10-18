@@ -12,6 +12,7 @@ class ImageSaver:
         self.__client = VkClient(token_vk, uid_vk, debug_mode=debug_mode)
         self.__uploader = YaUploader(token_ya, debug_mode=debug_mode)
         self.__types = {'s': 1, 'm': 2, 'x': 3, 'o': 4, 'p': 5, 'q': 6, 'r': 7, 'y': 8, 'z': 9, 'w': 10}
+        self.__delay = 0.3
         if self.__client.is_initialized() and self.__uploader.is_initialized():
             self.__status = f'{type(self).__name__} initialised.'
             self.__initialized = True
@@ -75,7 +76,7 @@ class ImageSaver:
                 break
             offset += count
             # prevent ban from service
-            time.sleep(0.3)
+            time.sleep(self.__delay)
         self.log(f'Loading images links finished', True)
         likes_set = set()
         # let's cut images to match exact max_count items
@@ -166,7 +167,7 @@ class ImageSaver:
                     result['message'] = f'Uploading file failed: {file[2]} ({response["object"]})'
                     break
                 # prevent ban
-                time.sleep(0.3)
+                time.sleep(self.__delay)
             json.dump(log, log_file)
             self.log(f'\nLog file saved to {log_file_path}', True)
         self.log(f'Uploading log file to disk with overwrite...', True)

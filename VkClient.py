@@ -14,6 +14,7 @@ class VkClient:
         self.__version = version
         self.__headers = {'User-Agent': 'Netology'}
         self.__params = {'access_token': self.__token, 'v': self.__version}
+        self.__delay = 0.3
         # below line needed for get_users only
         self.__initialized = True
         # try to instantiate
@@ -83,7 +84,7 @@ class VkClient:
             for x in friend['common_friends']:
                 result.append(VkClient(self.__token, x))
                 # to prevent ban from server
-                time.sleep(0.3)
+                time.sleep(self.__delay)
         return result
 
     @staticmethod

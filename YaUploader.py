@@ -16,6 +16,7 @@ class YaUploader:
         self.__folder_create_scheme = '/v1/disk/resources'
         self.__disk_info_scheme = '/v1/disk'
         self.__headers = {'User-Agent': 'Netology', 'Authorization': 'OAuth ' + self.__token}
+        self.__delay = 0.3
         # below line needed for get_disk_info only
         self.__initialized = True
         # try to instantiate
@@ -270,7 +271,7 @@ class YaUploader:
         if not url:
             self.log('Error: URL is empty.', True)
             return {'object': None, 'success': False, 'message': f'URL is empty'}
-        timer = 0.3
+        timer = self.__delay
         while True:
             time.sleep(timer)
             self.log('Checking ' + url, True)
@@ -278,7 +279,7 @@ class YaUploader:
             # gives 10 attempts
             if (response['success'] and response['object']['status'] == 'in-progress') and timer < 3:
                 # slightly increase wait time
-                timer += 0.3
+                timer += self.__delay
                 self.log('Check failed. Next attempt after ' + str(timer) + ' sec', True)
             elif timer >= 3:
                 return {'object': None, 'success': False, 'message': 'Timeout reached'}
