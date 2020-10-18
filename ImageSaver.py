@@ -155,10 +155,10 @@ class ImageSaver:
             log_file_path = 'images_log.json'
         with open(log_file_path, 'w+') as log_file:
             log = []
-            for file in files:
+            for count, file in enumerate(files, 1):
                 response = self.__uploader.upload_remote_file(folder + '/' + str(file[0]) + file[1], file[2])
                 if response['success']:
-                    self.log(f'Uploading file accepted: {response["object"]["href"]}', True)
+                    self.log(f'Uploading file #{count} accepted: {response["object"]["href"]}', True)
                     log.append({'filename': f'{file[0]}{file[1]}', 'size': f'{file[3]}'})
                 else:
                     self.log(f'Uploading file failed: {file[2]} ({response["object"]})', True)
