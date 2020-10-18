@@ -47,7 +47,7 @@ class ImageSaver:
         :param max_qty: maximum photos to be returned
         :param vk_id: VK user ID, otherwise will be taken user ID during class instance init
         :param album_id: one of album type: wall, profile, saved
-        :return: list with sublists ['likes': int, 'img url': str, 'extension': str, 'size type': str] or empty list
+        :return: list with sublists ['likes': str, 'img url': str, 'extension': str, 'size type': str] or empty list
         """
         result = []
         if not self.__initialized:
@@ -77,6 +77,7 @@ class ImageSaver:
             # prevent ban from service
             time.sleep(0.3)
         self.log(f'Loading images links finished', True)
+        likes_set = set()
         # let's cut images to match exact max_count items
         for item in images[:max_qty]:
             # let's detect images with the maximum resolution, based on dimensions or on type if dimensions is absent
@@ -104,7 +105,16 @@ class ImageSaver:
             if max_res == 0:
                 img_url = img_url_fallback
             # save likes, img url, file extension and size type in sublist
-            result.append([item['likes']['count'], pl.Path(img_url).suffix, img_url, size_type_letter])
+            likes_count = str(item['likes']['count'])
+            # let's check if same filename already added and rename it
+            if likes_count in likes_set:
+                i = 1
+                postfix = '_'
+                while f'{likes_count}{postfix}{i}' in likes_set:
+                    i += 1
+                likes_count += f'{postfix}{i}'
+            likes_set.add(likes_count)
+            result.append([likes_count, pl.Path(img_url).suffix, img_url, size_type_letter])
         return result
 
     def create_folder(self, folder_name: str):
@@ -149,7 +159,7 @@ class ImageSaver:
                 response = self.__uploader.upload_remote_file(folder + '/' + str(file[0]) + file[1], file[2])
                 if response['success']:
                     self.log(f'Uploading file accepted: {response["object"]["href"]}', True)
-                    log.append({'filename': f'{str(file[0]) + file[1]}', 'size': f'{file[3]}'})
+                    log.append({'filename': f'{file[0]}{file[1]}', 'size': f'{file[3]}'})
                 else:
                     self.log(f'Uploading file failed: {file[2]} ({response["object"]})', True)
                     result['success'] = False
